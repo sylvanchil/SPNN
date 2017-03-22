@@ -1,4 +1,3 @@
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -15,7 +14,7 @@ class VisualUtil:
 		pdpc = pdmean.pct_change()
 
 
-		sharpe = np.sqrt(199) * pdpc.mean() / pdpc.std()
+		sharpe = np.sqrt(504) * pdpc.mean() / pdpc.std()
 		
 		for sim in p:
 			plt.plot(sim, color = 'grey')
