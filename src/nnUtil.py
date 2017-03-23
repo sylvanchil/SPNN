@@ -20,7 +20,20 @@ class NNUtil:
 		model.add(Dense(1, init= 'uniform', activation= 'linear'))
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
-	def buildCoreModel(self, dims):
+
+	def buildSimpleMLPModel(self, dims, predictWindow):
+		dropourRate = 0.5
+		model = Sequential()
+		model.add(Dense(100, input_shape=(dims,)) )
+		model.add(Dropout(dropourRate))
+		model.add(Dense(500, init= 'uniform', activation= 'relu'))
+		model.add(Dropout(dropourRate))
+		model.add(Dense(predictWindow, init= 'uniform', activation= 'linear'))
+		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
+		return model
+
+
+	def buildCoreModel(self, dims, predictWindow):
 		dropourRate = 0.5
 		model = Sequential()
 		model.add(Dense(1024, input_shape=(dims,)) )
@@ -29,7 +42,7 @@ class NNUtil:
 		model.add(Dropout(dropourRate))
 		model.add(Dense(256, init= 'uniform', activation= 'relu'))
 		model.add(Dropout(dropourRate))
-		model.add(Dense(1, init= 'uniform', activation= 'linear'))
+		model.add(Dense(predictWindow, init= 'uniform', activation= 'linear'))
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 

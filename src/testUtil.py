@@ -22,13 +22,25 @@ class TestUtil:
 	def testMultiOutput(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
 		data, rate= self.dataUtil.DataAndRate(df)
-		inputPrice = self.dataUtil.toMLPData(data, Configure.window, Configure.predictWindow)
-	
-		x_train, y_train, x_test, y_test = self.dataUtil.toMLPTrainAndTest(inputPrice, Configure.testSize, Configure.predictWindow)
-
-		print inputPrice
+		inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
 		
-		print y_test
+		x_train, y_train, x_test, y_test = self.dataUtil.toMLPTrainAndTest(inputRate, Configure.testSize, Configure.predictWindow)
+	
+		model = self.nnUtil.buildSimpleMLPModel(Configure.window*4, Configure.predictWindow)
+		
+		model = self.nnUtil.trainModel(model, x_train, y_train)
+
+	#	model.save('./mar19_trainedv3.h5')
+
+		p = model.predict(x_test)
+		
+		self.vUtil.drawPY(p, y_test)
+
+		
+	
+		#print inputPrice
+		
+		#print y_test
 		
 
 		#x = np.arange(-9, 0, 4,dtype=np.intp )

@@ -27,7 +27,10 @@ class DataUtil:
 	
 	def toMLPTrainAndTest(self,inputData,testSize, outputSize):
 		priceIndex = -1-4*(outputSize-1)
-		priceIndexs = np.arange(priceIndex, 0, outputSize)
+		priceIndexs = np.arange(priceIndex, 0, 4)
+		print priceIndex
+		print priceIndexs
+		print priceIndexs.shape
 
 		trainSize = inputData.shape[0]-testSize
 		trainData = inputData[:int(trainSize)]
