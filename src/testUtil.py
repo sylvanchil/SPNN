@@ -18,6 +18,26 @@ class TestUtil:
 	vUtil = VisualUtil()
 	simUtil = SimulateTrading()
 
+	
+	def testMultiOutput(self):
+		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
+		data, rate= self.dataUtil.DataAndRate(df)
+		inputPrice = self.dataUtil.toMLPData(data, Configure.window, Configure.predictWindow)
+	
+		x_train, y_train, x_test, y_test = self.dataUtil.toMLPTrainAndTest(inputPrice, Configure.testSize, Configure.predictWindow)
+
+		print inputPrice
+		
+		print y_test
+		
+
+		#x = np.arange(-9, 0, 4,dtype=np.intp )
+	
+		#print inputPrice[:,x]
+
+		#print inputPrice[0]
+
+
 	def testSampleAndTrain(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
 		data, rate= self.dataUtil.DataAndRate(df)

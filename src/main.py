@@ -8,5 +8,6 @@ if __name__ == '__main__':
 
 #	testModel.testSimAll()
 
-	testModel.testSampleTest()
+#	testModel.testSampleTest()
 #	testModel.testSingleSimAndVisual()
+	testModel.testMultiOutput()
