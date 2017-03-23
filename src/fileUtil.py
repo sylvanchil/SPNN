@@ -14,6 +14,7 @@ class FileUtil:
 		
 		if normailzed == 1:
 			print("nothing is done")
+
 		#dataframe.asmatrix()[0] = top of csv = latest data
 		return df
 

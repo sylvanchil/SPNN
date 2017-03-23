@@ -6,10 +6,9 @@ from dataUtil import DataUtil
 from nnUtil import NNUtil
 from visualize import VisualUtil
 from simulateTrading import SimulateTrading
-from random import random
+from random import random,shuffle
 import pickle
 import multiprocessing
-
 
 class TestUtil:
 	
@@ -19,7 +18,6 @@ class TestUtil:
 	vUtil = VisualUtil()
 	simUtil = SimulateTrading()
 
-	
 	def testSampleAndTrain(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
 		data, rate= self.dataUtil.DataAndRate(df)
@@ -108,13 +106,14 @@ class TestUtil:
 		simReturnSet= []
 
 
-		samples = [line for line in open(Configure.fileList) if random() <0.1]
+		samples = [line for line in open(Configure.fileList)]
+		shuffle(samples)	
+	
 
 		for filename in samples:
 			filename = filename.rstrip()
 			if(filename not in trainedSet):
-			#	print filename
-			#	self.testStockWithTrainedModel(filename, model)
+			
 				df = self.fileUtil.csvToDataFrame(filename, Configure.window)
 				if df.size< Configure.window*10:
 					continue 
@@ -127,52 +126,15 @@ class TestUtil:
 				x_train, y_train, x_test, y_test = self.dataUtil.trainAndTestSet(inputData, 504)
 				p = model.predict(x_test)
 			
-				simReturnSet.append(self.simUtil.simulate2(p,y_test, yprice))
+				simReturnSet.append(self.simUtil.simulate(p,y_test, yprice))
 			gc.collect()
 
-			if len(simReturnSet)>100:
+			if len(simReturnSet)>200:
 				break
-
-
-		'''
-		with open(Configure.fileList) as f:
-			for filename in f:
-				filename = filename.rstrip()
-				if(filename not in trainedSet):
-				#	print filename
-				#	self.testStockWithTrainedModel(filename, model)
-					df = self.fileUtil.csvToDataFrame(filename, Configure.window)
-					if df.size< Configure.window*4:
-						return 
-					data, rate= self.dataUtil.DataAndRate(df)
-					inputData = self.dataUtil.toInputData(rate, Configure.window, 1)
-					inputPrice = self.dataUtil.toInputData(data, Configure.window, 1)
-
-					xtmp, ytmp, xtmp2, yprice= self.dataUtil.trainAndTestSet(inputPrice, 200)
-
-					x_train, y_train, x_test, y_test = self.dataUtil.trainAndTestSet(inputData, 200)
-					p = model.predict(x_test)
-				
-					simReturnSet.append(self.simUtil.simulate(p,y_test, yprice))
-				gc.collect()
-
-				if len(simReturnSet)>200:
-					break
-		'''
-		
 	
 		self.vUtil.drawReturns(simReturnSet)
 
-
-
-
 	def testSimAll(self):
-		#filter out stock from log
-		#	maybe sample here 
-		#return price from sim
-		#plot all
-
-
 		model=self.nnUtil.loadModel('./mar19_trainedv3.h5')
 		with open(Configure.fileList) as f:
 			for filename in f:
