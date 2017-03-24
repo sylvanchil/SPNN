@@ -36,21 +36,50 @@ class TestUtil:
 		shuffle(fileList)
 		
 		AllTrainSet = np.empty([0, (Configure.window+Configure.predictWindow)*4]) 
+		
+		AllTrainList= []
+		AllTestList = []
+
+		total = 0
 		for filename in fileList:
+			total= total+1
 			filename = filename.rstrip()
 			df = self.fileUtil.csvToDataFrame(filename, Configure.window)
+				
+			#discard data with small size
 			if df.shape[0]-Configure.window+1 < Configure.testSize:
-				print filename
+				#print filename
 				continue
 			
 			data, rate = self.dataUtil.DataAndRate(df)
 			inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
-			trainSet, testData = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
-		
-			AllTrainSet = np.concatenate([AllTrainSet, trainSet], axis = 0)
-
-			gc.collect()
+			trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
 			
+			#AllTrainSet = np.concatenate([AllTrainSet, trainSet], axis = 0)
+			
+			AllTrainList.append(trainSet)
+
+			AllTestList.append(testSet)
+		
+			gc.collect()
+
+			print '%s: %s' %(total, filename)
+			#if len(AllTestList) >10:
+			#	break 
+
+	
+		#x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
+		
+		#AllTrainSet = np.asarray(AllTrainList)
+	
+		AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
+
+		print AllTrainSet
+
+		print AllTrainSet.shape 
+		
+
+
 	
 	def testMultiOutput(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
