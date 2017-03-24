@@ -1,5 +1,6 @@
 import gc
 import numpy as np
+import io
 from configure import Configure
 from fileUtil import FileUtil
 from dataUtil import DataUtil
@@ -18,6 +19,25 @@ class TestUtil:
 	vUtil = VisualUtil()
 	simUtil = SimulateTrading()
 
+
+	def final(self):
+		#join all train data
+		#shuffle
+		#train
+		#predict all stock, get 2000* 252* 1 or 2 or 3or 4 array
+		#sim 
+		#	for 0 to 251
+		# 		find top 10 from 2000
+		#	
+	
+		#all train data
+	
+		with open(Configure.fileList) as f:
+			for filename in f:
+				filename = filename.rstrip()
+				df = self.fileUtil.csvToDataFrame(filename, Configure.window)
+				data, rate = self.dataUtil.DataAndRate(df)
+				
 	
 	def testMultiOutput(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
@@ -26,28 +46,35 @@ class TestUtil:
 		
 		x_train, y_train, x_test, y_test = self.dataUtil.toMLPTrainAndTest(inputRate, Configure.testSize, Configure.predictWindow)
 	
+		#trainData, testData= self.dataUtil.toMLPTrainAndTestSet(inputRate,Configure.testSize)
+			
+		#x_train, y_train = self.dataUtil.toXAndY(trainData, Configure.predictWindow)
+		#x_test, y_test= self.dataUtil.toXAndY(testData, Configure.predictWindow)
+
+		print x_train.shape
+		print y_train.shape
+		print x_test.shape
+		print y_test.shape
+		return
+
+
 		model = self.nnUtil.buildSimpleMLPModel(Configure.window*4, Configure.predictWindow)
 		
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 
-	#	model.save('./mar19_trainedv3.h5')
-
 		p = model.predict(x_test)
-		
-		self.vUtil.drawPY(p, y_test)
 
+		p =p[:,0]
+		y_test =y_test[:, 0]
+		simReturnSet =[]
 		
-	
-		#print inputPrice
-		
-		#print y_test
-		
+		simReturnSet.append(self.simUtil.simulate3(p,y_test))
+		simReturnSet = np.array(simReturnSet)
+		self.vUtil.drawReturns(simReturnSet)
 
-		#x = np.arange(-9, 0, 4,dtype=np.intp )
-	
-		#print inputPrice[:,x]
 
-		#print inputPrice[0]
+
+
 
 
 	def testSampleAndTrain(self):

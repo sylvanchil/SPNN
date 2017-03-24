@@ -24,13 +24,25 @@ class DataUtil:
 			dataList.append(np.concatenate(data[index: index+ window+outputSize]))
 		ndaRates = np.array(dataList)
 		return ndaRates
-	
+
+	def toMLPTrainAndTestSet(self, inputData, testSize):
+		trainSize = inputData.shape[0]-testSize
+		trainData = inputData[:int(trainSize)]
+		testData = inputData[int(trainSize):]
+		
+		return trainData, testData
+
+	def toXAndY(self, data, outputSize):
+		priceIndex = -1-4*(outputSize-1)
+		priceIndexs = np.arange(priceIndex, 0, 4)
+
+		x = data[:,:Configure.window*4]
+		y = data[:,priceIndexs]
+		return x,y
+
 	def toMLPTrainAndTest(self,inputData,testSize, outputSize):
 		priceIndex = -1-4*(outputSize-1)
 		priceIndexs = np.arange(priceIndex, 0, 4)
-		print priceIndex
-		print priceIndexs
-		print priceIndexs.shape
 
 		trainSize = inputData.shape[0]-testSize
 		trainData = inputData[:int(trainSize)]

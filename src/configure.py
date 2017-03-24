@@ -6,14 +6,11 @@ class Configure:
 	modelDirectory= '%s/models' % outputDirectory
 
 	trainedModel = '/home/cj/Documents/SPNN/src/models/trained.h5'
-	stockName = '600894.ss'
-	testSize = 200
+	stockName = '002051.sz'
+	testSize = 252
 	window = 40
-	predictWindow = 2
+	predictWindow = 5
 	#change back to 500
-	epoch = 200
-	lever = 10000
-	moneyPool = 1000000
-	stockPool = 10000
+	epoch = 500
 
 

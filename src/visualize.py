@@ -3,7 +3,20 @@ import pandas as pd
 import numpy as np
 
 class VisualUtil:
+
+	def drawReturn(self , p):
+		parray = np.array(p)
+		parray = parray[0,0]
+
+		plt.plot(parray, color = 'grey')
+
+		plt.legend(loc = 'upper left')
 	
+		plt.grid(True, which= 'both')
+
+		plt.show()
+		return
+
 	def drawReturns(self, p):
 		data = np.array(p)	
 		

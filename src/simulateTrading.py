@@ -1,7 +1,24 @@
 from configure import Configure
+import numpy as np
 
 class SimulateTrading:
 	
+
+	def simulate3(self, p, y_test):
+		MoneyPool= 100000
+
+		predict = []
+
+		for index in range(1,len(p)):
+			
+			if p[index]>0:
+
+				MoneyPool = MoneyPool + MoneyPool*10*p[index]*(y_test[index]/10)
+			predict.append(MoneyPool)
+			print MoneyPool
+		
+		return np.array(predict)
+
 	def simulate(self, p, y_test, yprice):
 		MoneyPool= 0.0
 		MoneyCheat = 0.0

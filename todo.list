@@ -1,6 +1,6 @@
+save model, data,
 
 
-git
 
 evaluation
 	sharpe ratio	
@@ -8,7 +8,6 @@ evaluation
 	family wise error rate
 		Bonferroni test
 	false discovery rate
-
 
 
 
