@@ -31,24 +31,26 @@ class TestUtil:
 		#	
 	
 		#all train data
-		
 
+		fileList = [line for line in open(Configure.fileList)]
+		shuffle(fileList)
 		
-		with open(Configure.fileList) as f:
-			count =0
-			for filename in f:
-				filename = filename.rstrip()
-				df = self.fileUtil.csvToDataFrame(filename, Configure.window)
-				if df.shape[0]-Configure.window+1 < Configure.testSize:
-					count = count+1
-					continue
-				continue	
-				data, rate = self.dataUtil.DataAndRate(df)
-				inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
-				trainSet, testData = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
-					
-			print count 
+		AllTrainSet = np.empty([0, (Configure.window+Configure.predictWindow)*4]) 
+		for filename in fileList:
+			filename = filename.rstrip()
+			df = self.fileUtil.csvToDataFrame(filename, Configure.window)
+			if df.shape[0]-Configure.window+1 < Configure.testSize:
+				print filename
+				continue
+			
+			data, rate = self.dataUtil.DataAndRate(df)
+			inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
+			trainSet, testData = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
+		
+			AllTrainSet = np.concatenate([AllTrainSet, trainSet], axis = 0)
 
+			gc.collect()
+			
 	
 	def testMultiOutput(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
