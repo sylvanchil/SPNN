@@ -10,5 +10,5 @@ if __name__ == '__main__':
 
 #	testModel.testSampleTest()
 #	testModel.testSingleSimAndVisual()
-	testModel.testMultiOutput()
-#	testModel.final()
+#	testModel.testMultiOutput()
+	testModel.final()

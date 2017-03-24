@@ -31,13 +31,24 @@ class TestUtil:
 		#	
 	
 		#all train data
-	
+		
+
+		
 		with open(Configure.fileList) as f:
+			count =0
 			for filename in f:
 				filename = filename.rstrip()
 				df = self.fileUtil.csvToDataFrame(filename, Configure.window)
+				if df.shape[0]-Configure.window+1 < Configure.testSize:
+					count = count+1
+					continue
+				continue	
 				data, rate = self.dataUtil.DataAndRate(df)
-				
+				inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
+				trainSet, testData = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
+					
+			print count 
+
 	
 	def testMultiOutput(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
@@ -71,10 +82,6 @@ class TestUtil:
 		simReturnSet.append(self.simUtil.simulate3(p,y_test))
 		simReturnSet = np.array(simReturnSet)
 		self.vUtil.drawReturns(simReturnSet)
-
-
-
-
 
 
 	def testSampleAndTrain(self):
