@@ -35,8 +35,6 @@ class TestUtil:
 		fileList = [line for line in open(Configure.fileList)]
 		shuffle(fileList)
 		
-		AllTrainSet = np.empty([0, (Configure.window+Configure.predictWindow)*4]) 
-		
 		AllTrainList= []
 		AllTestList = []
 
@@ -67,20 +65,32 @@ class TestUtil:
 			#if len(AllTestList) >10:
 			#	break 
 
-	
-		#x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
-		
-		#AllTrainSet = np.asarray(AllTrainList)
-	
 		AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
-
-		print AllTrainSet
-
-		print AllTrainSet.shape 
 		
-
-
+		x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
 	
+		model = self.nnUtil.buildSimpleMLPModel(Configure.window*4, Configure.predictWindow)
+		
+		model = self.nnUtil.trainModel(model, x_train, y_train)
+		
+		count= 0	
+		for test in AllTestList:
+			count = count +1
+			x_test, y_test = self.dataUtil.toXAndY(test, Configure.predictWindow )
+			p=model.predict(x_test)
+			
+			p =p[:,0]
+			y_test =y_test[:, 0]
+
+			self.vUtil.drawPY(p, y_test)
+
+			if count >0:
+				break
+
+
+
+
+
 	def testMultiOutput(self):
 		df = self.fileUtil.csvToDataFrame(Configure.stockName, Configure.window)
 		data, rate= self.dataUtil.DataAndRate(df)
