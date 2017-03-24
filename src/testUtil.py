@@ -21,16 +21,16 @@ class TestUtil:
 
 
 	def final(self):
-		#join all train data
-		#shuffle
-		#train
 		#predict all stock, get 2000* 252* 1 or 2 or 3or 4 array
 		#sim 
 		#	for 0 to 251
 		# 		find top 10 from 2000
-		#	
-	
-		#all train data
+
+		'''
+		AllTrainSet = np.load('%s/TrainSet.npy'%Configure.midFileDirectory)
+		print AllTrainSet
+		return 	
+		'''
 
 		fileList = [line for line in open(Configure.fileList)]
 		shuffle(fileList)
@@ -62,11 +62,16 @@ class TestUtil:
 			gc.collect()
 
 			print '%s: %s' %(total, filename)
-			#if len(AllTestList) >10:
-			#	break 
 
 		AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
 		
+		np.save('%s/TrainSet.npy'%Configure.midFileDirectory, AllTrainSet)
+
+		for index in range(len(AllTestList) ):
+			np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
+	
+		return 
+
 		x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
 	
 		model = self.nnUtil.buildSimpleMLPModel(Configure.window*4, Configure.predictWindow)
@@ -86,9 +91,6 @@ class TestUtil:
 
 			if count >0:
 				break
-
-
-
 
 
 	def testMultiOutput(self):

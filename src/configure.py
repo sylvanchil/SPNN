@@ -4,7 +4,9 @@ class Configure:
 	fileList = '%s/filelist' % dataWarehouse
 	outputDirectory= '%s/output' % dataWarehouse
 	modelDirectory= '%s/models' % outputDirectory
+	midFileDirectory= '%s/midFile' % outputDirectory
 
+	
 	trainedModel = '/home/cj/Documents/SPNN/src/models/trained.h5'
 	stockName = '002051.sz'
 	testSize = 252
