@@ -1,0 +1,45 @@
+1. single input
+	Rawdata -(fileUtil, DataUtil)-> TrainXY, TestXY
+	TrainXY -(nnUtil, MLP or RNN or LSTM)-> model
+	model, TestXY--> prediction
+	prediction-(evaluationUtil, countHit)-> predict_evaluation
+	preciation-(simualtion, naviestrage)-> [gain] 
+	precidation-(vUtil)-> diagram
+	[gain]-(EvaluationUtil, sharpe ratio, tstatic, stock index)-> sim_evaluation
+	[gain]-(vUtil)->diagram
+
+2. multi input single model
+	[RawData] -(FileUtil, DataUtil)-> [TrainXY, TestXY]
+	[TranXY] -(DataUtil)-> TrainXY
+	TrainXy-(nnUtil, MLP RNN LSTM)-> model
+	model, [TestXy]->{prediction]
+	[prediction] -(evaluaitonutil, countHit)-> [predict_evaluation] 
+	[predict_evaluation] -(evaluationUtil, XXX) -> XXX
+	
+	[prediction] -(simutil, seleciton strategey)-> [gain]
+	[prediction] -(simutil , naive strategy) -> [[gain]], [finalgain]
+	
+	[gain]-(EvaluationUtil, sharpe ratio, tstatic, stock index)-> sim_evaluation
+	[gain]-(vUtil)->diagram
+	
+	[[gain]] -(vUtil, multiplot)-> diagram
+	[[gain]] -(evaluationUtil, xxx) -> [XXX]
+
+3. multi inpu multi model
+	[RawData] -(FileUtil, DataUtil)-> [TrainXY, TestXY]
+	[TrainXY] -(nnUtil, MLP RNN, LSTM) -> [model]
+	[model], [TestXY] -->[prediction]
+
+	[prediction] -(evaluaitonutil, countHit)-> [predict_evaluation] 
+	[predict_evaluation] -(evaluationUtil, XXX) -> XXX
+	
+	[prediction] -(simutil, seleciton strategey)-> [gain]
+	[prediction] -(simutil , naive strategy) -> [[gain]], [finalgain]
+	
+	[gain]-(EvaluationUtil, sharpe ratio, tstatic, stock index)-> sim_evaluation
+	[gain]-(vUtil)->diagram
+	
+	[[gain]] -(vUtil, multiplot)-> diagram
+	[[gain]] -(evaluationUtil, xxx) -> [XXX]
+
+
