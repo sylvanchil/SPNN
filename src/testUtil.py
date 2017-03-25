@@ -86,10 +86,7 @@ class TestUtil:
 
 			for index in range(len(AllTestList) ):
 				np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
-
-
 		
-
 		x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
 	
 		model = self.nnUtil.buildCoreModel(Configure.window*4, Configure.predictWindow)
