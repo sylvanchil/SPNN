@@ -1,8 +1,9 @@
+from SPNN import SPNN
 from testUtil import TestUtil
 
 if __name__ == '__main__':
 
-	testModel = TestUtil()
+#	testModel = TestUtil()
 	#testModel.testDefault()
 #	testModel.testSampleAndTrain()
 
@@ -11,4 +12,7 @@ if __name__ == '__main__':
 #	testModel.testSampleTest()
 #	testModel.testSingleSimAndVisual()
 #	testModel.testMultiOutput()
-	testModel.final()
+#	testModel.final()
+
+	spnn = SPNN()
+	spnn.SISM()
