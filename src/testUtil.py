@@ -25,56 +25,74 @@ class TestUtil:
 		#sim 
 		#	for 0 to 251
 		# 		find top 10 from 2000
-
-		'''
-		AllTrainSet = np.load('%s/TrainSet.npy'%Configure.midFileDirectory)
-		print AllTrainSet
-		return 	
-		'''
-
-		fileList = [line for line in open(Configure.fileList)]
-		shuffle(fileList)
 		
-		AllTrainList= []
-		AllTestList = []
-
-		total = 0
-		for filename in fileList:
-			total= total+1
-			filename = filename.rstrip()
-			df = self.fileUtil.csvToDataFrame(filename, Configure.window)
-				
-			#discard data with small size
-			if df.shape[0]-Configure.window+1 < Configure.testSize:
-				#print filename
-				continue
-			
-			data, rate = self.dataUtil.DataAndRate(df)
-			inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
-			trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
-			
-			#AllTrainSet = np.concatenate([AllTrainSet, trainSet], axis = 0)
-			
-			AllTrainList.append(trainSet)
-
-			AllTestList.append(testSet)
-		
-			gc.collect()
-
-			print '%s: %s' %(total, filename)
-
-		AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
-		
-		np.save('%s/TrainSet.npy'%Configure.midFileDirectory, AllTrainSet)
-
-		for index in range(len(AllTestList) ):
-			np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
+		AllTrainSet = np.empty(0)
+		AllTestList= []
 	
-		return 
+		useSavedFile = False 
+
+		if useSavedFile:
+
+			AllTrainSet = np.load('%s/TrainSet.npy'%Configure.midFileDirectory)
+
+			AllTestList = []
+		
+			for index in range(2325):
+				AllTestList.append(np.load('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index)))
+
+		else :
+
+			fileList = [line for line in open(Configure.fileList)]
+			shuffle(fileList)
+			
+			AllTrainList= []
+			AllTestList = []
+
+			total = 0
+			for filename in fileList:
+				total= total+1
+				filename = filename.rstrip()
+				df = self.fileUtil.csvToDataFrame(filename, Configure.window)
+					
+				#discard data with small size
+				if df.shape[0]-Configure.window+1 < Configure.testSize:
+					#print filename
+					continue
+				
+				data, rate = self.dataUtil.DataAndRate(df)
+				inputRate = self.dataUtil.toMLPData(rate, Configure.window, Configure.predictWindow)
+				trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, Configure.testSize)
+				
+				#AllTrainSet = np.concatenate([AllTrainSet, trainSet], axis = 0)
+				
+				AllTrainList.append(trainSet)
+
+				AllTestList.append(testSet)
+			
+				gc.collect()
+
+				print '%s: %s' %(total, filename)
+
+				if len(AllTrainList) >= 1:
+					break
+
+			AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
+
+		np.random.shuffle(AllTrainSet)
+
+		SaveData = False
+		if SaveData:
+			np.save('%s/TrainSet.npy'%Configure.midFileDirectory, AllTrainSet)
+
+			for index in range(len(AllTestList) ):
+				np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
+
+
+		
 
 		x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
 	
-		model = self.nnUtil.buildSimpleMLPModel(Configure.window*4, Configure.predictWindow)
+		model = self.nnUtil.buildCoreModel(Configure.window*4, Configure.predictWindow)
 		
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 		

@@ -43,11 +43,11 @@ class VisualUtil:
 
 
 	def drawPY(self, p, y_test):
-		plt.plot(p[:,0], color = 'red', label = 'prediction')
-		plt.plot(y_test[:,0], color = 'blue', label = 'y_test')
+		plt.plot(p, color = 'red', label = 'prediction')
+		plt.plot(y_test, color = 'blue', label = 'y_test')
 		plt.legend(loc = 'upper left')
-
 		plt.grid(True, which= 'both')
+		plt.subplots_adjust(left=0.04, right=0.96, top=0.96, bottom=0.04)
 		plt.show()
 		return 
 
