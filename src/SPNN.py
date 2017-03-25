@@ -103,7 +103,7 @@ class SPNN:
 		AllTrainSet = np.empty(0)
 		AllTestList= []
 		
-		useSavedFile = True
+		useSavedFile = False
 		if useSavedFile:
 			AllTrainSet = np.load('%s/TrainSet.npy'%Configure.midFileDirectory)
 			AllTestList = []
@@ -131,8 +131,8 @@ class SPNN:
 				AllTestList.append(testSet)
 				gc.collect()
 				print '%s: %s' %(total, filename)
-				if len(AllTrainList) >= 1:
-					break
+				#if len(AllTrainList) >= 1:
+				#	break
 			AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
 		np.random.shuffle(AllTrainSet)
 		SaveData = False

@@ -10,11 +10,11 @@ class Configure:
 	stockCode = '600894'
 	marketCode = 'ss'
 	stock = '%s.%s' % (stockCode, marketCode)
-	testSize = 252
-	window = 40
-	predictWindow = 5
+	testSize = 504
+	window = 60
+	predictWindow = 2
 	#change back to 500
-	epoch = 5
+	epoch = 1000
 
 
 
