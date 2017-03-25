@@ -6,13 +6,15 @@ class Configure:
 	modelDirectory= '%s/models' % outputDirectory
 	midFileDirectory= '%s/midFile' % outputDirectory
 
-	
 	trainedModel = '/home/cj/Documents/SPNN/src/models/trained.h5'
-	stock = '002051.sz'
+	stockCode = '600894'
+	marketCode = 'ss'
+	stock = '%s.%s' % (stockCode, marketCode)
 	testSize = 252
 	window = 40
 	predictWindow = 5
 	#change back to 500
-	epoch = 100
+	epoch = 5
+
 
 

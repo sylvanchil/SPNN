@@ -3,7 +3,29 @@ import pandas as pd
 import numpy as np
 
 class VisualUtil:
-	
+
+	def drawABGain(self, p,y_test, gain):
+		plt.plot(p, color = 'red', label = 'prediction')
+		plt.plot(y_test, color = 'blue', label = 'y_test')
+		plt.legend(loc = 'upper left')
+		plt.grid(True, which= 'both')
+		plt.subplots_adjust(left=0.04, right=0.96, top=0.96, bottom=0.04)
+		
+		plt.figure()
+		plt.plot(gain, color = 'grey')
+		plt.grid(True, which= 'both')
+		plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+		plt.show()
+
+		return 
+
+	def drawGain(self, gain):
+		plt.plot(gain, color = 'grey')
+		plt.grid(True, which= 'both')
+		plt.subplots_adjust(left=0.04, right=0.96, top=0.96, bottom=0.04)
+		plt.show()
+		return 
+
 	def drawAB(self, p, y_test):
 		plt.plot(p, color = 'red', label = 'prediction')
 		plt.plot(y_test, color = 'blue', label = 'y_test')

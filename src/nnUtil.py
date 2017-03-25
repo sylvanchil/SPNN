@@ -32,8 +32,7 @@ class NNUtil:
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 
-
-	def buildCoreModel(self, dims, predictWindow):
+	def buildLargeMLPModel(self, dims, predictWindow):
 		dropourRate = 0.5
 		model = Sequential()
 		model.add(Dense(1024, input_shape=(dims,)) )
@@ -46,36 +45,6 @@ class NNUtil:
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 
-	def buildSlimCoreModel(self, dims):
-		dropourRate = 0.5
-		model = Sequential()
-		model.add(Dense(100, input_shape=(dims,)) )
-		model.add(Dropout(dropourRate))
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-		
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-	
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-	
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-	
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-
-		model.add(Dense(100, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-	
-		model.add(Dense(48, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-		model.add(Dense(1, init= 'uniform', activation= 'linear'))
-		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
-	
 	def loadModel(self,model):
 		return load_model(model)
 

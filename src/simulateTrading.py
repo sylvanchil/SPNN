@@ -3,6 +3,16 @@ import numpy as np
 
 class SimulateTrading:
 	
+	def simWithNaive(self, p , y_test):
+		MoneyPool = 100000
+		predict = []
+	
+		for index in range(1,len(p)):
+			if p[index]>0:
+				if abs(y_test[index])<1:
+					MoneyPool = MoneyPool + MoneyPool*10*p[index]*(y_test[index]/10)
+			predict.append(MoneyPool)
+		return np.array(predict)
 
 	def simulate3(self, p, y_test):
 		MoneyPool= 100000
