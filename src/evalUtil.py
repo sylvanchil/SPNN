@@ -14,6 +14,8 @@ class EvalUtil:
 		rate =np.copy( gain)
 		for index in range(len(rate)-1, 0):
 			rate[index] = rate[index]/rate[index-1]-1
+			print rate[index]
+
 		rate[0] = 0
 		meanRate = np.mean(rate)
 		dvarRate = np.std(rate)

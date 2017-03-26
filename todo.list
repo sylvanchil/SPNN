@@ -1,26 +1,12 @@
-
+costum loss function
+try train_on_batch, test_on_batch, predict_on_batch, * generator
 multi process to process file
-
-save model, data,
-
-
-
 evaluation
 	sharpe ratio	
 	t static
 	family wise error rate
 		Bonferroni test
 	false discovery rate
-
-
-
 clean up testUtil
 clean up all class
-
-true train and test data set
-	for each input stock, seperate into train and test set
-	concatenate train set
-	test test in test set
 clean data
-
-

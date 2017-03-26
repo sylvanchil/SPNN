@@ -54,52 +54,19 @@ class SPNN:
 		gain = self.simUtil.simWithNaive(p, y_test)
 		sharpeRatio = self.evalUtil.evalGain(gain)
 		print "Gain sharpe ratio of : %.4f" % sharpeRatio
-		self.vUtil.drawABGain(p,y_test, gain)
+		#self.vUtil.drawABGain(p,y_test, gain)
+		
+		randomSims = self.simUtil.simWithRandom(y_test)
+		self.vUtil.drawGainAndRandom(gain, randomSims)
 
+			
 		return 
-
-	'''
-	2. multi input single model
-		[RawData] -(FileUtil, DataUtil)-> [TrainXY, TestXY]
-		[TranXY] -(DataUtil)-> TrainXY
-		TrainXy-(nnUtil, MLP RNN LSTM)-> model
-		model, [TestXy]->{prediction]
-		[prediction] -(evaluaitonutil, countHit)-> [predict_evaluation] 
-		[predict_evaluation] -(evaluationUtil, XXX) -> XXX
-		
-		[prediction] -(simutil, seleciton strategey)-> [gain]
-		[prediction] -(simutil , naive strategy) -> [[gain]], [finalgain]
-		
-		[gain]-(EvaluationUtil, sharpe ratio, tstatic, stock index)-> sim_evaluation
-		[gain]-(vUtil)->diagram
-		
-		[[gain]] -(vUtil, multiplot)-> diagram
-		[[gain]] -(evaluationUtil, xxx) -> [XXX]
-
-	3. multi inpu multi model
-		[RawData] -(FileUtil, DataUtil)-> [TrainXY, TestXY]
-		[TrainXY] -(nnUtil, MLP RNN, LSTM) -> [model]
-		[model], [TestXY] -->[prediction]
-
-		[prediction] -(evaluaitonutil, countHit)-> [predict_evaluation] 
-		[predict_evaluation] -(evaluationUtil, XXX) -> XXX
-		
-		[prediction] -(simutil, seleciton strategey)-> [gain]
-		[prediction] -(simutil , naive strategy) -> [[gain]], [finalgain]
-		
-		[gain]-(EvaluationUtil, sharpe ratio, tstatic, stock index)-> sim_evaluation
-		[gain]-(vUtil)->diagram
-		
-		[[gain]] -(vUtil, multiplot)-> diagram
-		[[gain]] -(evaluationUtil, xxx) -> [XXX]
-
-	'''
 
 	def MISM(self, 
 			testSize = Configure.testSize,
 			window= Configure.window,
 			predictWindow= Configure.predictWindow):
-
+		
 		AllTrainSet = np.empty(0)
 		AllTestList= []
 		
@@ -131,8 +98,8 @@ class SPNN:
 				AllTestList.append(testSet)
 				gc.collect()
 				print '%s: %s' %(total, filename)
-				#if len(AllTrainList) >= 1:
-				#	break
+				if len(AllTrainList) >= 10:
+					break
 			AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
 		np.random.shuffle(AllTrainSet)
 		SaveData = False
@@ -144,24 +111,40 @@ class SPNN:
 		model = self.nnUtil.buildLargeMLPModel(Configure.window*4, Configure.predictWindow)
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 		model.save('%s/TM170325V1'% Configure.modelDirectory)   	
-		
-		count= 0	
+
+	
+		#genera list of prediction
+
+		predicitions =[]
+		y_tests = []
+
 		for test in AllTestList:
-			count = count +1
 			x_test, y_test = self.dataUtil.toXAndY(test, Configure.predictWindow )
 			p=model.predict(x_test)
-			p =p[:,0]
-			y_test =y_test[:, 0]
-		
+			
+			predictions.append(p)
+			y_tests.append(y_test)
+			
+			#p =p[:,0]
+			#y_test =y_test[:, 0]
+			
+			'''
 			hit, total = self.evalUtil.countHit(p, y_test)
 			print "Hit %s in %s , accuracy: %.4f" %(hit, total, hit*1.0000/total)
 			gain = self.simUtil.simWithNaive(p, y_test)
 			sharpeRatio = self.evalUtil.evalGain(gain)
 			print "Gain sharpe ratio of : %.4f" % sharpeRatio
 			self.vUtil.drawABGain(p,y_test, gain)
+		
+		hits, totals, accuracies = self.evalUtil.countHits(predictions, y_tests)
+		
+		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
-			if count >0:
-				break
+		naiveGains = sef.simUtil.simWthNavieMulti(predicitions, y_test)
+		'''
+		
+
+
 
 
 

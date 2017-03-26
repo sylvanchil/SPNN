@@ -17,4 +17,4 @@ if __name__ == '__main__':
 #	testModel.final()
 
 	spnn = SPNN()
-	spnn.MISM()
+	spnn.SISM()

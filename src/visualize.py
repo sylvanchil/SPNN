@@ -4,6 +4,21 @@ import numpy as np
 
 class VisualUtil:
 
+	def drawGainAndRandom(self,gain, randomSims):
+		for sim in randomSims:
+			plt.plot(sim, color = 'grey')
+
+		meanOfRan= np.mean(randomSims, axis=0)
+
+		plt.plot(gain, color = 'blue', label = 'gain')
+		plt.plot(meanOfRan, color = 'red', label = 'mean of random')
+
+		plt.grid(True, which= 'both')
+		plt.subplots_adjust(left=0.04, right=0.96, top=0.96, bottom=0.04)
+		plt.show()
+		return 
+
+	
 	def drawABGain(self, p,y_test, gain):
 		plt.plot(p, color = 'red', label = 'prediction')
 		plt.plot(y_test, color = 'blue', label = 'y_test')

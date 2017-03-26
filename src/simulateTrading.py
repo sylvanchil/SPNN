@@ -1,16 +1,32 @@
 from configure import Configure
+from random import random, shuffle
 import numpy as np
 
 class SimulateTrading:
-	
+	def simWithRandom(self, y_test):
+		MoneyPool = 100000
+		randomSims =[]
+		
+		for index in range(100):
+			
+			MoneyPool = 100000
+			randomSim = []
+			for index2 in range(1, len(y_test)):
+				ranPred = random()*2-1
+				if ranPred>0 and abs(y_test[index2]<1):
+					MoneyPool = MoneyPool + MoneyPool*ranPred*(y_test[index2]/10)
+				randomSim.append(MoneyPool)
+			randomSims.append(randomSim)
+		return np.array(randomSims)
+
 	def simWithNaive(self, p , y_test):
 		MoneyPool = 100000
 		predict = []
-	
+		
 		for index in range(1,len(p)):
 			if p[index]>0:
 				if abs(y_test[index])<1:
-					MoneyPool = MoneyPool + MoneyPool*10*p[index]*(y_test[index]/10)
+					MoneyPool = MoneyPool + MoneyPool*p[index]*(y_test[index]/10)
 			predict.append(MoneyPool)
 		return np.array(predict)
 

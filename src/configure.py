@@ -10,11 +10,12 @@ class Configure:
 	stockCode = '600894'
 	marketCode = 'ss'
 	stock = '%s.%s' % (stockCode, marketCode)
+	# test 504 for 2 year
 	testSize = 504
 	window = 60
 	predictWindow = 2
 	#change back to 500
-	epoch = 1000
+	epoch = 500
 
 
 
