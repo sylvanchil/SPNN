@@ -7,9 +7,9 @@ class EvalUtil:
 		for index in range(p.shape[0]):
 			if p[index] > 0 and y_test[index]>0 or p[index] < 0 and y_test[index] <0:
 				hit = hit+1
-		
 		return hit, p.shape[0]
 
+	#incorrect here
 	def evalGain(self, gain):
 		rate =np.copy( gain)
 		for index in range(len(rate)-1, 0):

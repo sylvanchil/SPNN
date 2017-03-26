@@ -1,11 +1,11 @@
 
 import numpy as np
+from keras import optimizers
 from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM
 from keras.models import load_model
-
 from configure import Configure
 
 
@@ -21,28 +21,21 @@ class NNUtil:
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 
-	def buildSimpleMLPModel(self, dims, predictWindow):
+	def buildMLPModel(self, dims, predictWindow):
 		dropourRate = 0.5
+		
+		sgd = optimizers.SGD(lr=0.1, decay=1e-3, momentum=0.9, nesterov=True)
+		RMSprop = optimizers.RMSprop(lr=0.001, rho=0.9, epsilon=1e-08, decay=0.0)		
 		model = Sequential()
-		model.add(Dense(100, input_shape=(dims,)) )
+		model.add(Dense(2048, input_shape=(dims,)) )
 		model.add(Dropout(dropourRate))
-		model.add(Dense(500, init= 'uniform', activation= 'relu'))
-		model.add(Dropout(dropourRate))
-		model.add(Dense(predictWindow, init= 'uniform', activation= 'linear'))
-		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
-		return model
-
-	def buildLargeMLPModel(self, dims, predictWindow):
-		dropourRate = 0.5
-		model = Sequential()
-		model.add(Dense(1024, input_shape=(dims,)) )
-		model.add(Dropout(dropourRate))
-		model.add(Dense(1024, init= 'uniform', activation= 'relu'))
+		model.add(Dense(1024, init= 'uniform', activation= 'tanh'))
 		model.add(Dropout(dropourRate))
 		model.add(Dense(256, init= 'uniform', activation= 'relu'))
 		model.add(Dropout(dropourRate))
 		model.add(Dense(predictWindow, init= 'uniform', activation= 'linear'))
-		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
+		model.compile(loss= 'mse', optimizer= RMSprop , metrics= ['accuracy'])
+		#model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 
 	def loadModel(self,model):

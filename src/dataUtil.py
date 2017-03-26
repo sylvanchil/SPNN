@@ -40,20 +40,4 @@ class DataUtil:
 		y = data[:,priceIndexs]
 		return x,y
 
-	def toMLPTrainAndTest(self,inputData,testSize, outputSize):
-		priceIndex = -1-4*(outputSize-1)
-		priceIndexs = np.arange(priceIndex, 0, 4)
-
-		trainSize = inputData.shape[0]-testSize
-		trainData = inputData[:int(trainSize)]
-		x_train = trainData[:,:Configure.window*4]
-		#y_train = trainData[:,-1]
-		y_train = trainData[:,priceIndexs]
-
-
-		testData = inputData[int(trainSize):]
-		x_test = testData[:,:Configure.window*4]
-		#y_test = testData[:,-1]
-		y_test = testData[:,priceIndexs]
-		return x_train, y_train, x_test, y_test
 

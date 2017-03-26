@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 from SPNN import SPNN
-from testUtil import TestUtil
 
 if __name__ == '__main__':
 
