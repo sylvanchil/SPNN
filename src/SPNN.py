@@ -42,7 +42,6 @@ class SPNN:
 		model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
 
 		model = self.nnUtil.trainModel(model, x_train, y_train)
-		model.save('%s/TM170325V1FOR%s'%(Configure.modelDirectory, Configure.stockCode))   	
 		
 		p=model.predict(x_test)
 		p =p[:,0]
@@ -106,7 +105,7 @@ class SPNN:
 				np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
 		
 		x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
-		model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
+		model = self.nnUtil.buildMLPModel(Configure.window*4, Configure.predictWindow)
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 	
 		saveModel = True
@@ -138,4 +137,64 @@ class SPNN:
 
 		self.vUtil.drawGain(gain)
 
+	def MIMM(self, 
+			testSize = Configure.testSize,
+			window= Configure.window,
+			predictWindow= Configure.predictWindow):
+		
+		
+		
+		fileList = [line for line in open(Configure.fileList)]
+		shuffle(fileList)
+		total = 0
+
+		predictions = []
+		y_tests = []
+		accuracies = []
+		gains= []
+
+		for filename in fileList:
+			
+			filename = filename.rstrip()
+			df = self.fileUtil.csvToDataFrame(filename, Configure.window)
+			
+			if df.shape[0]-Configure.window+1 < Configure.testSize:
+				print "skipped %s, not enough data" % filename
+				continue
 	
+			data, rate = self.dataUtil.DataAndRate(df)
+			inputRate = self.dataUtil.toMLPData(rate, window, predictWindow)
+			trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, testSize)
+			x_train, y_train= self.dataUtil.toXAndY( trainSet, Configure.predictWindow)
+			
+			x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
+			
+			model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
+
+			model = self.nnUtil.trainModel(model, x_train, y_train)
+			
+			p=model.predict(x_test)
+			p =p[:,0]
+			y_test =y_test[:, 0]
+
+
+			hit, total = self.evalUtil.countHit(p, y_test)
+			gain = self.simUtil.simWithNaive(p, y_test)
+
+			predictions.append(p)
+			y_tests.append(y_test)
+			if total != 0:
+				accuracies.append(hit*1.00/total)
+			gains.append(gain)
+
+			if len(predictions) >= 30:
+				break	
+
+		gain = self.simUtil.simWithSelection(predictions,y_tests)
+
+		self.vUtil.drawGain(gain)
+
+		#self.vUtil.drawGains(gains)
+		return
+
+

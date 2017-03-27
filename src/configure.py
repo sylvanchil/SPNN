@@ -15,7 +15,7 @@ class Configure:
 	window = 60
 	predictWindow = 2
 	#change back to 500
-	epoch = 100
+	epoch = 500
 
 
 
