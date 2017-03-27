@@ -130,14 +130,12 @@ class SPNN:
 		
 		#self.vUtil.drawHist(accuracies)
 		
-		#gain = self.simUtil.simWithSelection(predictions,y_tests)
-
-		#self.vUtil.drawGain(gain)
-
-		naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
+		#naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
 	
-		self.vUtil.drawGains(naiveGains)
+		#self.vUtil.drawGains(naiveGains)
 		
-		
+		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
+		self.vUtil.drawGain(gain)
 
+	
