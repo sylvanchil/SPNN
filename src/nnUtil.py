@@ -21,6 +21,18 @@ class NNUtil:
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 
+	def buildMiniMLPModel(self, dims, predictWindow):
+		dropourRate = 0.5
+		
+		model = Sequential()
+		model.add(Dense(200, input_shape=(dims,)) )
+		model.add(Dropout(dropourRate))
+		model.add(Dense(256, init= 'uniform', activation= 'relu'))
+		model.add(Dropout(dropourRate))
+		model.add(Dense(predictWindow, init= 'uniform', activation= 'linear'))
+		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
+		return model
+
 	def buildMLPModel(self, dims, predictWindow):
 		dropourRate = 0.5
 		

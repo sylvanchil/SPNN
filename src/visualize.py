@@ -3,6 +3,22 @@ import pandas as pd
 import numpy as np
 
 class VisualUtil:
+	def drawGains(self, gains):
+		meanOfGain= np.mean(gains, axis= 0)
+		
+		for gain in gains:
+			plt.plot(gain, color = 'blue')
+		plt.plot(meanOfGain, color = 'red')
+		plt.grid(True, which= 'both')
+		plt.show()
+
+
+
+	def drawHist(self, data):
+		bins = [0.2,0.8,0.01]
+		plt.hist(data,bins=100)
+		plt.show()
+	
 	def drawABGainRandom(self,p, y_test, gain, randomSims):
 		plt.plot(p, color = 'red', label = 'prediction')
 		plt.plot(y_test, color = 'blue', label = 'y_test')

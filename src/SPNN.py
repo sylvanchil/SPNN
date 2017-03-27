@@ -39,7 +39,7 @@ class SPNN:
 		
 		x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
 		
-		model = self.nnUtil.buildMLPModel(Configure.window*4, Configure.predictWindow)
+		model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
 
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 		model.save('%s/TM170325V1FOR%s'%(Configure.modelDirectory, Configure.stockCode))   	
@@ -92,7 +92,8 @@ class SPNN:
 				AllTestList.append(testSet)
 				gc.collect()
 				print '%s: %s' %(total, filename)
-				if len(AllTrainList) >= 10:
+				
+				if len(AllTrainList) >= 100:
 					break
 			AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
 		
@@ -105,63 +106,38 @@ class SPNN:
 				np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
 		
 		x_train, y_train= self.dataUtil.toXAndY(AllTrainSet, Configure.predictWindow)
-		model = self.nnUtil.buildLargeMLPModel(Configure.window*4, Configure.predictWindow)
+		model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
 		model = self.nnUtil.trainModel(model, x_train, y_train)
-		model.save('%s/TM170325V1'% Configure.modelDirectory)   	
-
 	
-		#genera list of prediction
+		saveModel = True
+		if saveModel:
+			model.save('%s/TM170325V1'% Configure.modelDirectory)   	
 
-		predicitions =[]
+		predictions =[]
 		y_tests = []
 
 		for test in AllTestList:
 			x_test, y_test = self.dataUtil.toXAndY(test, Configure.predictWindow )
 			p=model.predict(x_test)
 			
+			p =p[:,0]
+			y_test =y_test[:, 0]
+		
 			predictions.append(p)
 			y_tests.append(y_test)
-			
-			#p =p[:,0]
-			#y_test =y_test[:, 0]
-			
-			'''
-			hit, total = self.evalUtil.countHit(p, y_test)
-			print "Hit %s in %s , accuracy: %.4f" %(hit, total, hit*1.0000/total)
-			gain = self.simUtil.simWithNaive(p, y_test)
-			sharpeRatio = self.evalUtil.evalGain(gain)
-			print "Gain sharpe ratio of : %.4f" % sharpeRatio
-			self.vUtil.drawABGain(p,y_test, gain)
-		
+	
 		hits, totals, accuracies = self.evalUtil.countHits(predictions, y_tests)
 		
-		gain = self.simUtil.simWithSelection(predictions,y_tests)
-
-		naiveGains = sef.simUtil.simWthNavieMulti(predicitions, y_test)
-		'''
+		#self.vUtil.drawHist(accuracies)
 		
+		#gain = self.simUtil.simWithSelection(predictions,y_tests)
 
+		#self.vUtil.drawGain(gain)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
+	
+		self.vUtil.drawGains(naiveGains)
+		
+		
 
 

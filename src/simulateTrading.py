@@ -3,6 +3,12 @@ from random import random, shuffle
 import numpy as np
 
 class SimulateTrading:
+	def simWithNaiveMulti(self, p, y_test):
+		predictions = []
+		for index in range(len(p)):
+			predictions.append(self.simWithNaive(p[index], y_test[index]))
+		return predictions
+
 	def simWithRandom(self, y_test):
 		MoneyPool = 1000000
 		randomSims =[]
