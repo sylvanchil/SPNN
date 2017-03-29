@@ -1,4 +1,4 @@
-Stock Prediction with Neural Network	
+Stock recommendation system based on Neural Network	
 
 
 

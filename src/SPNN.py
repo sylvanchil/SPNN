@@ -187,8 +187,8 @@ class SPNN:
 				accuracies.append(hit*1.00/total)
 			gains.append(gain)
 
-			if len(predictions) >= 30:
-				break	
+			#if len(predictions) >= 50:
+			#	break	
 
 		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
