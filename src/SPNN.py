@@ -43,6 +43,13 @@ class SPNN:
 
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 		
+		#bayes model = xxx
+		#bayes fit
+
+		#p = bayes model predict
+		#
+
+		
 		p=model.predict(x_test)
 		p =p[:,0]
 		y_test =y_test[:, 0]
@@ -126,13 +133,9 @@ class SPNN:
 			y_tests.append(y_test)
 	
 		hits, totals, accuracies = self.evalUtil.countHits(predictions, y_tests)
-		
 		#self.vUtil.drawHist(accuracies)
-		
 		#naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
-	
 		#self.vUtil.drawGains(naiveGains)
-		
 		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
 		self.vUtil.drawGain(gain)
@@ -141,8 +144,6 @@ class SPNN:
 			testSize = Configure.testSize,
 			window= Configure.window,
 			predictWindow= Configure.predictWindow):
-		
-		
 		
 		fileList = [line for line in open(Configure.fileList)]
 		shuffle(fileList)
@@ -169,7 +170,7 @@ class SPNN:
 			
 			x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
 			
-			model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
+			model = self.nnUtil.buildMiniMLPModel(Configure.window*5, Configure.predictWindow)
 
 			model = self.nnUtil.trainModel(model, x_train, y_train)
 			
@@ -186,14 +187,11 @@ class SPNN:
 			if total != 0:
 				accuracies.append(hit*1.00/total)
 			gains.append(gain)
-
 			#if len(predictions) >= 50:
 			#	break	
-
 		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
 		self.vUtil.drawGain(gain)
-
 		#self.vUtil.drawGains(gains)
 		return
 
