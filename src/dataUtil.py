@@ -17,7 +17,25 @@ class DataUtil:
 		data= data[::-1]
 		rate = rate[::-1]
 		return data, rate
+
+	def toLSTMData(self, data, window, outputSize):
+		dataList= []
+		for index in range(len(data)-(window+outputSize)+1):
+			dataList.append( data[index: index+window+outputSize])
+		ndadata = np.array(dataList)
+		return ndadata
 	
+	def toLSTMTrainAndTestSet(self, inputData, testSize):
+		trainSize = inputData.shape[0]-testSize
+		trainData = inputData[:int(trainSize)]
+		testData = inputData[int(trainSize):]
+		return trainData, testData
+
+	def toLSTMXAndY(self, data, outputSize):
+		x = data[:, :Configure.window]
+		y = data[:, -outputSize:, -1]
+		return x,y
+
 	def toMLPData(self, data, window,outputSize):
 		dataList =[]
 		for index in range(len(data) - (window+outputSize)+1 ):

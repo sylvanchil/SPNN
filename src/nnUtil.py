@@ -10,14 +10,16 @@ from configure import Configure
 
 
 class NNUtil:
-	def buildLSTMModel(self, dims):
+	def buildLSTMModel(self, dims, predictWindow):
 		dropourRate = 0.5
 		model = Sequential()
-		model.add(LSTM(128, input_shape = (dims) ,return_sequences=False  ) )
+		model.add(LSTM(64, input_shape = (dims) ,return_sequences=True  ) )
+		model.add(Dropout(dropourRate))
+		model.add(LSTM(64, input_shape= (dims) , return_sequences=False  ) )
 		model.add(Dropout(dropourRate))
 		model.add(Dense(64, init= 'uniform', activation= 'relu'))
 		model.add(Dropout(dropourRate))
-		model.add(Dense(1, init= 'uniform', activation= 'linear'))
+		model.add(Dense(predictWindow, init= 'uniform', activation= 'linear'))
 		model.compile(loss= 'mse', optimizer='adam', metrics= ['accuracy'])
 		return model
 

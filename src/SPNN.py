@@ -22,6 +22,49 @@ class SPNN:
 	evalUtil= EvalUtil()
 	simUtil = SimulateTrading()
 
+
+	def SISMLSTM(self, 
+			stock= Configure.stock,
+			testSize = Configure.testSize,
+			window= Configure.window,
+			predictWindow= Configure.predictWindow):
+		
+		df = self.fileUtil.csvToDataFrame(stock, window)
+		if df.shape[0]-window+1 < Configure.testSize:
+			print "Not enough data"
+			return
+		data, rate = self.dataUtil.DataAndRate(df)
+
+		inputRate= self.dataUtil.toLSTMData(rate, window, predictWindow)
+		trainSet, testSet= self.dataUtil.toLSTMTrainAndTestSet(inputRate, testSize)
+		x_train, y_train= self.dataUtil.toLSTMXAndY( trainSet, Configure.predictWindow)
+		
+		x_test, y_test = self.dataUtil.toLSTMXAndY(testSet, Configure.predictWindow )
+		
+		print inputRate.shape
+		print trainSet.shape
+		print testSet.shape
+		print x_train.shape
+		print y_train.shape
+		print x_test.shape
+		print y_test.shape
+
+		model = self.nnUtil.buildLSTMModel([Configure.window,4], Configure.predictWindow)
+		
+		
+		model = self.nnUtil.trainModel(model, x_train, y_train)
+		
+		p=model.predict(x_test)
+		p =p[:,0]
+		y_test =y_test[:, 0]
+
+		hit, total = self.evalUtil.countHit(p, y_test)
+		print "Hit %s in %s , accuracy: %.4f" %(hit, total, hit*1.0000/total)
+		gain = self.simUtil.simWithNaive(p, y_test)
+		randomSims = self.simUtil.simWithRandom(y_test)
+		self.vUtil.drawABGainRandom(p, y_test, gain, randomSims)
+		return 
+	
 	def SISM(self, 
 			stock= Configure.stock,
 			testSize = Configure.testSize,
