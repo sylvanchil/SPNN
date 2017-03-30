@@ -1,0 +1,13 @@
+bayes
+svm
+
+visulize function(xx = none, xx = none)
+multi process to process file
+save model, data
+evaluation
+	sharpe ratio	
+	t static
+	family wise error rate
+		Bonferroni test
+	false discovery rate
+
