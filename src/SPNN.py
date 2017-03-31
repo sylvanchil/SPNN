@@ -23,6 +23,123 @@ class SPNN:
 	simUtil = SimulateTrading()
 
 
+	def statEssemble(self, 
+		testSize = Configure.testSize,
+		window= Configure.window,
+		predictWindow= Configure.predictWindow):
+		
+		fileList = [line for line in open(Configure.fileList)]
+		shuffle(fileList)
+
+		hits = 0
+		totals =0
+	
+		for filename in fileList:
+			
+			filename = filename.rstrip()
+			print filename
+			hit, total = self.essemble(stock=filename)	
+			if hit!= None:
+				hits = hits + hit
+				totals = total+ totals
+		return
+
+	def essemble(self, 
+			stock= Configure.stock,
+			testSize = Configure.testSize,
+			window= Configure.window,
+			predictWindow= Configure.predictWindow):
+		
+		df = self.fileUtil.csvToDataFrame(stock, window)
+		if df.shape[0]-window+1 < Configure.testSize:
+			print "Not enough data"
+			#return 
+			# for stat
+			return 0,0 
+		data, rate = self.dataUtil.DataAndRate(df)
+		inputRate = self.dataUtil.toMLPData(rate, window, predictWindow)
+		trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, testSize)
+		x_train, y_train= self.dataUtil.toXAndY( trainSet, Configure.predictWindow)
+		
+		x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
+	
+		y_train_bayes=np.copy(y_train)
+		y_test_bayes= np.copy(y_test)
+
+		flip = 0
+
+		for i in range(len(y_train_bayes)):
+			for j in range(len(y_train_bayes[i])):
+				if y_train_bayes[i][j] >0:
+					flip = 1
+					y_train_bayes[i][j] =1
+				else:
+					y_train_bayes[i][j] =0
+
+	
+		if flip ==0:
+			return 0,0
+		for i in range(len(y_test_bayes)):
+			for j in range(len(y_test_bayes[i])):
+				if y_test_bayes[i][j] >0:
+					y_test_bayes[i][j] =1
+				else:
+					y_test_bayes[i][j] =0
+
+		y_train_bayes= y_train_bayes[:,0]	
+		y_test_bayes = y_test_bayes[:, 0]
+		from sklearn.metrics import accuracy_score
+
+		from sklearn.naive_bayes import GaussianNB
+		bayesmodel = GaussianNB()
+		bayesmodel.fit(x_train, y_train_bayes)
+		p= bayesmodel.predict(x_test)
+		
+		#print p
+
+		bayesAccuracy = accuracy_score(y_test_bayes,p)
+		
+		print "%.4f" % bayesAccuracy
+		
+		from sklearn.svm import LinearSVC
+		svmmodel= LinearSVC()
+		svmmodel.fit(x_train, y_train_bayes)
+		psvm=  svmmodel.predict(x_test)
+		svmAccuracy = accuracy_score(y_test_bayes,psvm)
+		
+		#print psvm
+		print "%.4f" % svmAccuracy
+
+		from sklearn import tree
+		dtmodel = tree.DecisionTreeClassifier()
+		dtmodel = dtmodel.fit(x_train, y_train_bayes)
+		pdt = dtmodel.predict(x_test)
+		dtAccuracy = accuracy_score(y_test_bayes,pdt)
+		#print pdt
+		print "%.4f" % dtAccuracy
+
+
+		from sklearn.neighbors import KNeighborsClassifier
+		neigh = KNeighborsClassifier(n_neighbors=len(x_train)/2)
+		neigh.fit(x_train, y_train_bayes) 
+		pnei = neigh.predict(x_test)
+	
+		neiAccuracy = accuracy_score(y_test_bayes, pnei)
+		
+		#print pnei
+		print "%.4f" % neiAccuracy
+		
+		hit = 0
+		total =0
+
+		for index in range(len(p)):
+			if p[index]==1 and pnei[index]==1 and psvm[index]==1 and pdt[index]==1:
+				total= total +1
+				if y_test_bayes[index] ==1:
+					hit= hit+1
+		
+		return hit, total
+
 	def SISMLSTM(self, 
 			stock= Configure.stock,
 			testSize = Configure.testSize,
@@ -41,23 +158,11 @@ class SPNN:
 		
 		x_test, y_test = self.dataUtil.toLSTMXAndY(testSet, Configure.predictWindow )
 		
-		print inputRate.shape
-		print trainSet.shape
-		print testSet.shape
-		print x_train.shape
-		print y_train.shape
-		print x_test.shape
-		print y_test.shape
-
 		model = self.nnUtil.buildLSTMModel([Configure.window,4], Configure.predictWindow)
-		
-		
 		model = self.nnUtil.trainModel(model, x_train, y_train)
-		
 		p=model.predict(x_test)
 		p =p[:,0]
 		y_test =y_test[:, 0]
-
 		hit, total = self.evalUtil.countHit(p, y_test)
 		print "Hit %s in %s , accuracy: %.4f" %(hit, total, hit*1.0000/total)
 		gain = self.simUtil.simWithNaive(p, y_test)

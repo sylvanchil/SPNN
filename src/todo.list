@@ -1,8 +1,7 @@
-bayes
-svm
-
-visulize function(xx = none, xx = none)
+use Ensemble to filter stock
 multi process to process file
+visulize function(xx = none, xx = none)
+
 save model, data
 evaluation
 	sharpe ratio	

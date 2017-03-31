@@ -7,7 +7,7 @@ class Configure:
 	midFileDirectory= '%s/midFile' % outputDirectory
 
 	trainedModel = '/home/cj/Documents/SPNN/src/models/trained.h5'
-	stockCode = '600894'
+	stockCode = '600050'
 	marketCode = 'ss'
 	stock = '%s.%s' % (stockCode, marketCode)
 	# test 504 for 2 year
