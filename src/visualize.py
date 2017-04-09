@@ -12,8 +12,6 @@ class VisualUtil:
 		plt.grid(True, which= 'both')
 		plt.show()
 
-
-
 	def drawHist(self, data):
 		bins = [0.2,0.8,0.01]
 		plt.hist(data,bins=100)

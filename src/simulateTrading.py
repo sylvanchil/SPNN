@@ -61,5 +61,6 @@ class SimulateTrading:
 			if p[index]>0:
 				if abs(y_test[index])<1:
 					MoneyPool = MoneyPool + MoneyPool*p[index]*(y_test[index]/10)
+
 			predict.append(MoneyPool)
 		return np.array(predict)

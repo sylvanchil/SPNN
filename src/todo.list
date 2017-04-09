@@ -1,12 +1,10 @@
-use Ensemble to filter stock
-multi process to process file
+cluster stock based on behavior
 visulize function(xx = none, xx = none)
 
-save model, data
+mongodb
+
 evaluation
-	sharpe ratio	
-	t static
 	family wise error rate
-		Bonferroni test
+	Bonferroni test
 	false discovery rate
 

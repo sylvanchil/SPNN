@@ -10,7 +10,8 @@ class FileUtil:
 		date_split = df['Date'].str.split('-').str
 		df['Year'], df['Month'], df['Day'] = date_split
 		#take only four element	
-		df.drop(df.columns[[0, 5,6,7,8,9]], axis= 1, inplace = True)
+		
+		df.drop(df.columns[[0,5,6,7,8,9]], axis= 1, inplace = True)
 		
 		if normailzed == 1:
 			print("nothing is done")

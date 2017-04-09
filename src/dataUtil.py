@@ -53,9 +53,21 @@ class DataUtil:
 	def toXAndY(self, data, outputSize):
 		priceIndex = -1-4*(outputSize-1)
 		priceIndexs = np.arange(priceIndex, 0, 4)
-
 		x = data[:,:Configure.window*4]
 		y = data[:,priceIndexs]
 		return x,y
 
+
+	def toClassLabel(self,data):
+		zeros = 0
+		ones = 0
+		for i in range(len(data)):
+			for j in range(len(data[i])):
+				if data[i][j] >0:
+					ones= 1
+					data[i][j] =1
+				else:
+					data[i][j] =0
+					zeros = 1
+		return data, zeros + ones
 

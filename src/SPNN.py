@@ -6,10 +6,11 @@ from fileUtil import FileUtil
 from dataUtil import DataUtil
 from nnUtil import NNUtil
 from visualize import VisualUtil
+from ensembleUtil import ensembleUtil
 from simulateTrading import SimulateTrading
 from evalUtil import EvalUtil
 from random import random,shuffle
-
+from sklearn.metrics import accuracy_score
 import pickle
 import multiprocessing
 
@@ -21,30 +22,114 @@ class SPNN:
 	vUtil = VisualUtil()
 	evalUtil= EvalUtil()
 	simUtil = SimulateTrading()
+	embUtil = ensembleUtil()
 
+	def worker(self,procnum, return_dict):
+		print str(procnum) + ' represent!'
+		return_dict[procnum] = procnum
 
-	def statEssemble(self, 
+	def worker2(self,procnum, return_list):
+		print str(procnum) + ' represent!'
+		return_list.append(procnum)
+
+	def ensembleWorker(self, return_list, filename):
+		print filename
+		return_list.append(self.ensemble(stock=filename))
+		return 
+
+	def testMulProc(self):
+		manager = multiprocessing.Manager()
+		return_dict = manager.dict()
+		return_list = manager.list()
+		jobs = []
+		for i in range(10000000):
+			p = multiprocessing.Process(target=self.worker2, args=(i,return_list))
+			jobs.append(p)
+			p.start()
+		for proc in jobs:
+			proc.join()
+		print return_list
+	
+	def statEnsembleMultiProc(self, 
 		testSize = Configure.testSize,
 		window= Configure.window,
 		predictWindow= Configure.predictWindow):
 		
 		fileList = [line for line in open(Configure.fileList)]
 		shuffle(fileList)
-
-		hits = 0
-		totals =0
+		manager = multiprocessing.Manager()
+		return_list = manager.list()
+		
+		count =0
+		sample = True
+		
+		jobs = []
 	
 		for filename in fileList:
-			
+			count = count +1
 			filename = filename.rstrip()
-			print filename
-			hit, total = self.essemble(stock=filename)	
-			if hit!= None:
-				hits = hits + hit
-				totals = total+ totals
+			p = multiprocessing.Process(target = self.ensembleWorker, args=(return_list, filename))
+			jobs.append(p)
+			p.start()
+			
+			if sample and count >=1000:
+				break	
+
+		for proc in jobs:
+			proc.join()
+
+		gains = np.array(return_list)
+	
+		self.vUtil.drawGain(gains)
 		return
 
-	def essemble(self, 
+
+	def statEnsemble(self, 
+		testSize = Configure.testSize,
+		window= Configure.window,
+		predictWindow= Configure.predictWindow):
+		
+		fileList = [line for line in open(Configure.fileList)]
+		shuffle(fileList)
+		
+		gains = []	
+		count =0
+	
+		sample = True
+		
+		for filename in fileList:
+			count = count +1
+			filename = filename.rstrip()
+			print filename
+			gain = self.ensemble(stock=filename)	
+			if sample and count >=1000:
+				break	
+			gains.append(gain)
+		
+		print sum(gains)/len(gains)
+
+		gains = np.array(gains)
+	
+		greater =0
+		less =0
+		remain = 0
+		for i in gains:
+			if i >1000000:
+				greater = greater +1
+			elif i ==1000000:
+				remain = remain+1
+			else:
+				less = less +1
+
+		print greater
+		print less
+		print remain
+
+		self.vUtil.drawGain(gains)
+
+		return
+
+	def ensemble(self, 
 			stock= Configure.stock,
 			testSize = Configure.testSize,
 			window= Configure.window,
@@ -53,92 +138,31 @@ class SPNN:
 		df = self.fileUtil.csvToDataFrame(stock, window)
 		if df.shape[0]-window+1 < Configure.testSize:
 			print "Not enough data"
-			#return 
-			# for stat
-			return 0,0 
+			return 1000000
 		data, rate = self.dataUtil.DataAndRate(df)
 		inputRate = self.dataUtil.toMLPData(rate, window, predictWindow)
 		trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, testSize)
 		x_train, y_train= self.dataUtil.toXAndY( trainSet, Configure.predictWindow)
-		
 		x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
+		
+		y_train_class=np.copy(y_train)
+		y_test_class= np.copy(y_test)
+
+		y_train_class,flip = self.dataUtil.toClassLabel(y_train_class)
+		if flip <2:
+			return 1000000
+		y_test_class,flip = self.dataUtil.toClassLabel(y_test_class)
+
+		y_train_class= y_train_class[:,0]	
+		y_test_class = y_test_class[:,0]
+		y_test = y_test[:,0]
+		y_train = y_train[:,0]
 	
-		y_train_bayes=np.copy(y_train)
-		y_test_bayes= np.copy(y_test)
-
-		flip = 0
-
-		for i in range(len(y_train_bayes)):
-			for j in range(len(y_train_bayes[i])):
-				if y_train_bayes[i][j] >0:
-					flip = 1
-					y_train_bayes[i][j] =1
-				else:
-					y_train_bayes[i][j] =0
-
-	
-		if flip ==0:
-			return 0,0
-		for i in range(len(y_test_bayes)):
-			for j in range(len(y_test_bayes[i])):
-				if y_test_bayes[i][j] >0:
-					y_test_bayes[i][j] =1
-				else:
-					y_test_bayes[i][j] =0
-
-		y_train_bayes= y_train_bayes[:,0]	
-		y_test_bayes = y_test_bayes[:, 0]
-		from sklearn.metrics import accuracy_score
-
-		from sklearn.naive_bayes import GaussianNB
-		bayesmodel = GaussianNB()
-		bayesmodel.fit(x_train, y_train_bayes)
-		p= bayesmodel.predict(x_test)
-		
-		#print p
-
-		bayesAccuracy = accuracy_score(y_test_bayes,p)
-		
-		print "%.4f" % bayesAccuracy
-		
-		from sklearn.svm import LinearSVC
-		svmmodel= LinearSVC()
-		svmmodel.fit(x_train, y_train_bayes)
-		psvm=  svmmodel.predict(x_test)
-		svmAccuracy = accuracy_score(y_test_bayes,psvm)
-		
-		#print psvm
-		print "%.4f" % svmAccuracy
-
-		from sklearn import tree
-		dtmodel = tree.DecisionTreeClassifier()
-		dtmodel = dtmodel.fit(x_train, y_train_bayes)
-		pdt = dtmodel.predict(x_test)
-		dtAccuracy = accuracy_score(y_test_bayes,pdt)
-		#print pdt
-		print "%.4f" % dtAccuracy
-
-
-		from sklearn.neighbors import KNeighborsClassifier
-		neigh = KNeighborsClassifier(n_neighbors=len(x_train)/2)
-		neigh.fit(x_train, y_train_bayes) 
-		pnei = neigh.predict(x_test)
-	
-		neiAccuracy = accuracy_score(y_test_bayes, pnei)
-		
-		#print pnei
-		print "%.4f" % neiAccuracy
-		
-		hit = 0
-		total =0
-
-		for index in range(len(p)):
-			if p[index]==1 and pnei[index]==1 and psvm[index]==1 and pdt[index]==1:
-				total= total +1
-				if y_test_bayes[index] ==1:
-					hit= hit+1
-		
-		return hit, total
+		psvc = self.embUtil.SVRPredict(x_train, y_train, x_test)
+		gain = self.simUtil.simWithNaive(psvc, y_test)
+		if len(gain)==0:
+			return 1000000
+		return gain[-1]
 
 	def SISMLSTM(self, 
 			stock= Configure.stock,
@@ -190,13 +214,6 @@ class SPNN:
 		model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
 
 		model = self.nnUtil.trainModel(model, x_train, y_train)
-		
-		#bayes model = xxx
-		#bayes fit
-
-		#p = bayes model predict
-		#
-
 		
 		p=model.predict(x_test)
 		p =p[:,0]
@@ -318,7 +335,7 @@ class SPNN:
 			
 			x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
 			
-			model = self.nnUtil.buildMiniMLPModel(Configure.window*5, Configure.predictWindow)
+			model = self.nnUtil.buildMiniMLPModel(Configure.window*4, Configure.predictWindow)
 
 			model = self.nnUtil.trainModel(model, x_train, y_train)
 			
@@ -335,8 +352,8 @@ class SPNN:
 			if total != 0:
 				accuracies.append(hit*1.00/total)
 			gains.append(gain)
-			#if len(predictions) >= 50:
-			#	break	
+			if len(predictions) >= 200:
+				break	
 		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
 		self.vUtil.drawGain(gain)
