@@ -26,8 +26,6 @@ class SimulateTrading:
 
 		return gain
 
-
-
 	def simWithNaiveMulti(self, p, y_test):
 		predictions = []
 		for index in range(len(p)):

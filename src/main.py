@@ -6,6 +6,6 @@ if __name__ == '__main__':
 
 	spnn = SPNN()
 	#spnn.ensemble()
-	spnn.statEnsembleMultiProc2()
+	spnn.statEnsembleMultiProc()
 	#spnn.statEnsemble()
 
