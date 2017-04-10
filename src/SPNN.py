@@ -24,32 +24,77 @@ class SPNN:
 	simUtil = SimulateTrading()
 	embUtil = ensembleUtil()
 
-	def worker(self,procnum, return_dict):
-		print str(procnum) + ' represent!'
-		return_dict[procnum] = procnum
-
-	def worker2(self,procnum, return_list):
-		print str(procnum) + ' represent!'
-		return_list.append(procnum)
-
 	def ensembleWorker(self, return_list, filename):
 		print filename
 		return_list.append(self.ensemble(stock=filename))
 		return 
 
-	def testMulProc(self):
+	def ensembleWorker2(self, return_list, fileQueue):
+		while not fileQueue.empty():
+			filename = fileQueue.get()
+			print filename
+			return_list.append(self.ensemble(stock=filename))
+		return
+		
+	def statEnsembleMultiProc2(self, 
+		testSize = Configure.testSize,
+		window= Configure.window,
+		predictWindow= Configure.predictWindow):
+		
+		fileList = [line for line in open(Configure.fileList)]
+		shuffle(fileList)
 		manager = multiprocessing.Manager()
-		return_dict = manager.dict()
 		return_list = manager.list()
+		fileQueue = manager.Queue()
+
+		sample = True
+		sampleSize= 100
+		count =0
+		for filename in fileList:
+			count = count+1
+			filename = filename.rstrip()
+			fileQueue.put(filename)
+			if sample and count >sampleSize:
+				break
+
+		
 		jobs = []
-		for i in range(10000000):
-			p = multiprocessing.Process(target=self.worker2, args=(i,return_list))
+	
+		ncpus = multiprocessing.cpu_count()
+
+		for i in range(ncpus):
+			filename = filename.rstrip()
+			p = multiprocessing.Process(target = self.ensembleWorker2, args=(return_list, fileQueue))
 			jobs.append(p)
 			p.start()
+
 		for proc in jobs:
 			proc.join()
-		print return_list
-	
+		#Join will block the current process until the process we started finishes
+
+		gains = np.array(return_list)
+		print sum(gains)/len(gains)
+		
+		greater =0
+		less =0
+		remain = 0
+		for i in gains:
+			if i >1000000:
+				greater = greater +1
+			elif i ==1000000:
+				remain = remain+1
+			else:
+				less = less +1
+
+		print greater
+		print less
+		print remain
+
+
+		self.vUtil.drawGain(gains)
+		return
+
+
 	def statEnsembleMultiProc(self, 
 		testSize = Configure.testSize,
 		window= Configure.window,
@@ -64,39 +109,51 @@ class SPNN:
 		sample = True
 		
 		jobs = []
-	
+		
 		for filename in fileList:
 			count = count +1
 			filename = filename.rstrip()
 			p = multiprocessing.Process(target = self.ensembleWorker, args=(return_list, filename))
 			jobs.append(p)
 			p.start()
-			
 			if sample and count >=1000:
 				break	
 
 		for proc in jobs:
 			proc.join()
+		#Join will block the current process until the process we started finishes
 
 		gains = np.array(return_list)
-	
+		print sum(gains)/len(gains)
+		
+		greater =0
+		less =0
+		remain = 0
+		for i in gains:
+			if i >1000000:
+				greater = greater +1
+			elif i ==1000000:
+				remain = remain+1
+			else:
+				less = less +1
+
+		print greater
+		print less
+		print remain
+
+
 		self.vUtil.drawGain(gains)
 		return
-
 
 	def statEnsemble(self, 
 		testSize = Configure.testSize,
 		window= Configure.window,
 		predictWindow= Configure.predictWindow):
-		
 		fileList = [line for line in open(Configure.fileList)]
 		shuffle(fileList)
-		
 		gains = []	
 		count =0
-	
 		sample = True
-		
 		for filename in fileList:
 			count = count +1
 			filename = filename.rstrip()
@@ -105,11 +162,8 @@ class SPNN:
 			if sample and count >=1000:
 				break	
 			gains.append(gain)
-		
 		print sum(gains)/len(gains)
-
 		gains = np.array(gains)
-	
 		greater =0
 		less =0
 		remain = 0
@@ -129,12 +183,12 @@ class SPNN:
 
 		return
 
-	def ensemble(self, 
-			stock= Configure.stock,
-			testSize = Configure.testSize,
-			window= Configure.window,
-			predictWindow= Configure.predictWindow):
-		
+	def ensemble(self,
+		stock= Configure.stock,
+		testSize = Configure.testSize,
+		window= Configure.window,
+		predictWindow= Configure.predictWindow):
+
 		df = self.fileUtil.csvToDataFrame(stock, window)
 		if df.shape[0]-window+1 < Configure.testSize:
 			print "Not enough data"
@@ -144,7 +198,7 @@ class SPNN:
 		trainSet, testSet = self.dataUtil.toMLPTrainAndTestSet(inputRate, testSize)
 		x_train, y_train= self.dataUtil.toXAndY( trainSet, Configure.predictWindow)
 		x_test, y_test = self.dataUtil.toXAndY(testSet, Configure.predictWindow )
-		
+
 		y_train_class=np.copy(y_train)
 		y_test_class= np.copy(y_test)
 
@@ -153,16 +207,17 @@ class SPNN:
 			return 1000000
 		y_test_class,flip = self.dataUtil.toClassLabel(y_test_class)
 
-		y_train_class= y_train_class[:,0]	
+		y_train_class= y_train_class[:,0]
 		y_test_class = y_test_class[:,0]
 		y_test = y_test[:,0]
 		y_train = y_train[:,0]
-	
+
 		psvc = self.embUtil.SVRPredict(x_train, y_train, x_test)
 		gain = self.simUtil.simWithNaive(psvc, y_test)
 		if len(gain)==0:
 			return 1000000
 		return gain[-1]
+
 
 	def SISMLSTM(self, 
 			stock= Configure.stock,

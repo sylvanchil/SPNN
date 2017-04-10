@@ -1,3 +1,7 @@
+multiproc
+	use pool or modifi worker
+
+
 cluster stock based on behavior
 visulize function(xx = none, xx = none)
 
