@@ -61,7 +61,7 @@ class NNUtil:
 		model.fit(
 			x_train,
 			y_train,
-			batch_size=4096,
+			batch_size=8192,
 			nb_epoch=Configure.epoch,
 			validation_split=0.1,
 			verbose=1

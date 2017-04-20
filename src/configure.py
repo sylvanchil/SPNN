@@ -1,5 +1,5 @@
 class Configure:
-	dataWarehouse= '/home/cj/Documents/Data/SPNN'
+	dataWarehouse= '/media/cj/MyFiles/Data/SPNN'
 	dataFolder = '%s/data20170403' % dataWarehouse
 	fileList = '%s/filelist' % dataWarehouse
 	outputDirectory= '%s/output' % dataWarehouse
@@ -11,8 +11,8 @@ class Configure:
 	marketCode = 'ss'
 	stock = '%s.%s' % (stockCode, marketCode)
 	# test 504 for 2 year
-	testSize = 504
-	window = 40
+	testSize = 100
+	window = 55
 	predictWindow = 2
 	#change back to 500
 	epoch = 2000

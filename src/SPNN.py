@@ -30,7 +30,7 @@ class SPNN:
 			print filename
 			psvr, y_test=self.ensemble(stock=filename)
 
-			return_list.append((psvr,y_test))
+			return_list.append((filename,psvr,y_test))
 		return
 		
 	def statEnsembleMultiProc(self, 
@@ -44,8 +44,8 @@ class SPNN:
 		return_list = manager.list()
 		fileQueue = manager.Queue()
 
-		sample = False
-		sampleSize= 1000
+		sample = True
+		sampleSize= 30
 		count =0
 		for filename in fileList:
 			count = count+1
@@ -67,22 +67,17 @@ class SPNN:
 		for proc in jobs:
 			proc.join()
 		#Join will block the current process until the process we started finishes
-		
-		predicts = []
-		y_tests = []
+	
+		stocks = {}
 
 		for item in return_list:
-			if type(item[0]) is not int:
-				predicts.append(item[0])
-				y_tests.append(item[1])
+			if type(item[1]) is not int:
+				stocks[item[0]]	= (item[1],item[2])	
+	
+		print stocks
 		
-		gain = self.simUtil.simWithSelection(predicts,y_tests)
-		self.vUtil.drawGain(gain)
-
-		#gains = np.array(return_list)
-		#print sum(gains)/len(gains)
-		#self.vUtil.drawGain(gains)
-		
+		#gain = self.simUtil.simWithSelection(predicts,y_tests)
+		#self.vUtil.drawGain(gain)
 		return
 
 	def ensemble(self,
@@ -297,7 +292,6 @@ class SPNN:
 			p =p[:,0]
 			y_test =y_test[:, 0]
 
-
 			hit, total = self.evalUtil.countHit(p, y_test)
 			gain = self.simUtil.simWithNaive(p, y_test)
 
@@ -306,12 +300,14 @@ class SPNN:
 			if total != 0:
 				accuracies.append(hit*1.00/total)
 			gains.append(gain)
-			if len(predictions) >= 200:
-				break	
+			#if len(predictions) >= 300:
+			#	break
+			print len(predictions)
+
+
 		gain = self.simUtil.simWithSelection(predictions,y_tests)
 
 		self.vUtil.drawGain(gain)
 		#self.vUtil.drawGains(gains)
 		return
-
 
