@@ -6,4 +6,4 @@ if __name__ == '__main__':
 
 	spnn = SPNN()
 	#spnn.statEnsembleMultiProc()
-	spnn.SISM()
+	spnn.MultiTest()

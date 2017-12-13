@@ -1,7 +1,6 @@
 
 import numpy as np
 from keras import optimizers
-from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.recurrent import LSTM

@@ -1,6 +1,9 @@
 import gc
 import numpy as np
 import io
+
+import json 
+
 from configure import Configure
 from fileUtil import FileUtil
 from dataUtil import DataUtil
@@ -10,7 +13,6 @@ from ensembleUtil import ensembleUtil
 from simulateTrading import SimulateTrading
 from evalUtil import EvalUtil
 from random import random,shuffle
-from sklearn.metrics import accuracy_score
 import pickle
 import multiprocessing
 
@@ -184,9 +186,7 @@ class SPNN:
 		AllTrainList= []
 		AllTestList= []
 		
-		useSavedFile = False
-		
-		if useSavedFile:
+		if Configure.useSavedFile:
 			AllTrainSet = np.load('%s/TrainSet.npy'%Configure.midFileDirectory)
 			AllTestList = []
 			for index in range(2325):
@@ -213,14 +213,13 @@ class SPNN:
 				gc.collect()
 				print '%s: %s' %(total, filename)
 				
-				if len(AllTrainList) >= 100:
+				if len(AllTrainList) >= Configure.sampleSize:
 					break
 			AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
 		
 		np.random.shuffle(AllTrainSet)
 		
-		SaveData = False
-		if SaveData:
+		if Configure.saveData:
 			np.save('%s/TrainSet.npy'%Configure.midFileDirectory, AllTrainSet)
 			for index in range(len(AllTestList) ):
 				np.save('%s/TestDataSet/%s.npy'%(Configure.midFileDirectory, index), AllTestList[index])
@@ -229,8 +228,7 @@ class SPNN:
 		model = self.nnUtil.buildMLPModel(Configure.window*4, Configure.predictWindow)
 		model = self.nnUtil.trainModel(model, x_train, y_train)
 	
-		saveModel = True
-		if saveModel:
+		if Configure.saveModel:
 			model.save('%s/TM170325V1'% Configure.modelDirectory)   	
 
 		predictions =[]
@@ -247,13 +245,30 @@ class SPNN:
 			y_tests.append(y_test)
 	
 		hits, totals, accuracies = self.evalUtil.countHits(predictions, y_tests)
-		#self.vUtil.drawHist(accuracies)
-		#naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
-		#self.vUtil.drawGains(naiveGains)
-		gain = self.simUtil.simWithSelection(predictions,y_tests)
+		seletionGain = self.simUtil.simWithSelection(predictions,y_tests)
+		naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
+	
+		if Configure.drawMISMResult:
+			self.vUtil.drawGain(seletionGain)
+			self.vUtil.drawHist(accuracies)
+		
+		return seletionGain, hits, totals
 
-		self.vUtil.drawGain(gain)
 
+	def MultiTest(self, testRounds = Configure.testRounds):
+		Configure.drawMISMResult = False
+		gains= []
+		
+		for round in range(1,testRounds):
+			
+			gain, hits, totals = self.MISM()
+			gains.append(gain)
+
+		npArrayGains = np.array(gains)
+		self.vUtil.drawGains(npArrayGains)
+		
+
+		
 	def MIMM(self, 
 			testSize = Configure.testSize,
 			window= Configure.window,

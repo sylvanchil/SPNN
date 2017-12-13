@@ -17,7 +17,7 @@ class SimulateTrading:
 			daygain=0
 			
 			for stock in topTen:
-				if abs(dayY[stock]) <1:
+				if abs(dayY[stock]) <0.98:
 					daygain =daygain + MoneyPool/10*dayPred[stock]*(dayY[stock]/10)
 			#print daygain
 

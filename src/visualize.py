@@ -15,6 +15,7 @@ class VisualUtil:
 	def drawHist(self, data):
 		bins = [0.2,0.8,0.01]
 		plt.hist(data,bins=100)
+		#plt.hist(data,bins=100)
 		plt.show()
 	
 	def drawABGainRandom(self,p, y_test, gain, randomSims):
