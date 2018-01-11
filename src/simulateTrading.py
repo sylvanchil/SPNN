@@ -7,17 +7,24 @@ class SimulateTrading:
 		gain= []
 		MoneyPool = 1000000
 		predictions = np.array(predictions)
+		# sample_size * test_days
 		y_tests = np.array(y_tests)
 
+
+		#for everyday
 		for index in range(1,Configure.testSize):
+		# why i start from 1
 			dayPred = predictions[:,index]
 			dayY = y_tests[:,index]
+
+			#prediction& test of every stock
 			topTen = dayPred.argsort()[-10:]
+			#sort by prediciton(ascending by default), choose top 10
 	
 			daygain=0
 			
 			for stock in topTen:
-				if abs(dayY[stock]) <0.98:
+				if abs(dayY[stock]) <0.97:
 					daygain =daygain + MoneyPool/10*dayPred[stock]*(dayY[stock]/10)
 			#print daygain
 

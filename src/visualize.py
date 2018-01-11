@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import os
 
 class VisualUtil:
 	def drawGains(self, gains):
@@ -86,5 +87,17 @@ class VisualUtil:
 		plt.subplots_adjust(left=0.04, right=0.96, top=0.96, bottom=0.04)
 		plt.show()
 		return 
+
+	def drawFile(self, filename):
+		if os.path.isfile(filename) not True:
+			print 'file not exit'
+		else if os.path.isdir(filename):
+			#print all files
+
+		else:
+			#print one file
+
+if __name__ == "__main__":
+	vu = VisualUtil()
 
 

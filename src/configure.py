@@ -7,7 +7,7 @@ class Configure:
 	midFileDirectory= '%s/midFile' % outputDirectory
 
 	
-	sampleSize = 1500
+	sampleSize = 400
 
 	useSavedFile = False
 	saveData = False
@@ -15,7 +15,7 @@ class Configure:
 
 	drawMISMResult = True
 
-	testRounds = 20
+	testRounds = 1
 
 	trainedModel = '/home/cj/Documents/SPNN/src/models/trained.h5'
 	stockCode = '600050'
@@ -26,7 +26,7 @@ class Configure:
 	window = 55
 	predictWindow = 2
 	#change back to 400
-	epoch = 10	
+	epoch = 100
 
 
 

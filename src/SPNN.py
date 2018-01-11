@@ -4,6 +4,8 @@ import io
 
 import json 
 
+import tempfile
+
 from configure import Configure
 from fileUtil import FileUtil
 from dataUtil import DataUtil
@@ -185,7 +187,9 @@ class SPNN:
 		AllTrainSet = np.empty(0)
 		AllTrainList= []
 		AllTestList= []
-		
+	
+		stocksList = []
+
 		if Configure.useSavedFile:
 			AllTrainSet = np.load('%s/TrainSet.npy'%Configure.midFileDirectory)
 			AllTestList = []
@@ -211,8 +215,11 @@ class SPNN:
 				AllTrainList.append(trainSet)
 				AllTestList.append(testSet)
 				gc.collect()
-				print '%s: %s' %(total, filename)
+				#print '%s: %s' %(total, filename)
 				
+				stocksList.append(filename)
+
+
 				if len(AllTrainList) >= Configure.sampleSize:
 					break
 			AllTrainSet = np.concatenate([line for line in AllTrainList], axis= 0)
@@ -237,31 +244,47 @@ class SPNN:
 		for test in AllTestList:
 			x_test, y_test = self.dataUtil.toXAndY(test, Configure.predictWindow )
 			p=model.predict(x_test)
-			
-			p =p[:,0]
-			y_test =y_test[:, 0]
 		
+			# change it back to the first day
+			p =p[:,1]
+			y_test =y_test[:, 1]
+			
+			#uing the first day prediction
+			#predication shape = (test_days*predition_windows)
+			# after [:, 0], p is test_days
+
 			predictions.append(p)
 			y_tests.append(y_test)
-	
-		hits, totals, accuracies = self.evalUtil.countHits(predictions, y_tests)
+		
+		#predictions is sample_size* test_day
+
+#		hits, totals, accuracies = self.evalUtil.countHits(predictions, y_tests)
 		seletionGain = self.simUtil.simWithSelection(predictions,y_tests)
-		naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
+#		naiveGains = self.simUtil.simWithNaiveMulti(predictions, y_tests)
 	
 		if Configure.drawMISMResult:
 			self.vUtil.drawGain(seletionGain)
 			self.vUtil.drawHist(accuracies)
+
+		return seletionGain
+
+	def saveGain(self):
+		Configure.drawMISMResult = False
 		
-		return seletionGain, hits, totals
+		gain = self.MISM()
+		tf = tempfile.NamedTemporaryFile(prefix = 'gain', dir = '/home/congq/SPNN/result/', delete = False)
+			
+		for item in gain:
+			tf.write("%s\n" % item)
 
 
 	def MultiTest(self, testRounds = Configure.testRounds):
 		Configure.drawMISMResult = False
 		gains= []
 		
-		for round in range(1,testRounds):
+		for round in range(0,testRounds):
 			
-			gain, hits, totals = self.MISM()
+			gain = self.MISM()
 			gains.append(gain)
 
 		npArrayGains = np.array(gains)
@@ -326,3 +349,7 @@ class SPNN:
 		#self.vUtil.drawGains(gains)
 		return
 
+
+if __name__ == "__main__":
+	spnn = SPNN()
+	spnn.saveGain()
