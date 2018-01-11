@@ -20,3 +20,29 @@ class FileUtil:
 		return df
 
 
+	 def getResults(self):
+		resultPath = '/home/congq/SPNN/result/'
+		#resultPath = '/home/congq/result'  
+		dirList = os.listdir(resultPath)
+	    
+		gains = []
+	    
+		for gainFile in dirList:
+		    gain = []
+		    with open(os.path.join(resultPath, gainFile)) as f:
+			for line in f:
+			    gain.append(float(line.rstrip()))
+	    
+		    gains.append(gain)
+		return dirList,gains
+
+
+if __name__ == '__main__':
+    fUtil = FileUtil();
+    
+    fileList, gains = fUtil.getResults()
+
+    for index in range(len(fileList)):
+        print fileList[index]
+        print gains[index][-1]
+

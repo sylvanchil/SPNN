@@ -43,4 +43,28 @@ class EvalUtil:
 		return sharpeRatio 
 
 
+	def evalGain2(self, gain):
+        	rate = np.copy(gain )
+		#print len(rate)
+		for index in reversed(range( 0, len(rate))):
+		    rate[index] = 1.0*rate[index]/rate[index-1]-1
+		    #print index
+		    #print rate[index]
 
+		rate[0] = 0 
+	    
+		meanRate = np.mean(rate)
+		dvarRate = np.std(rate)
+		print meanRate
+	    
+		sharpeRatio = meanRate/dvarRate*math.sqrt(252)
+		return sharpeRatio
+
+if __name__ == "__main__":
+    eval = EvalUtil()
+    rate= []
+
+    with open('../result/gainO0IcJC') as f:
+        for line in f:
+            rate.append(float(line.rstrip()))
+        print eval.evalGain(rate)
