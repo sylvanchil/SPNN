@@ -33,28 +33,28 @@ class SimulateTrading:
 
 		return gain
 
-    def simWithSelection(self, predictions, y_tests):
+	def simWithSelectionWithCommision(self, predictions, y_tests):
 		gain= []
 		MoneyPool = 1000000
 		predictions = np.array(predictions)
 		y_tests = np.array(y_tests)
 
 		for index in range(1,Configure.testSize):
-		    dayPred = predictions[:,index]
-		    dayY = y_tests[:,index]
-		    topTen = dayPred.argsort()[-10:]
-	    
-		    daygain=0
-	    
-		    for stock in topTen:
-			if abs(dayY[stock]) <0.97:
-			    daygain =daygain + MoneyPool/10*dayPred[stock]*(dayY[stock]/10-0.002)
-		    #print daygain
+			dayPred = predictions[:,index]
+			dayY = y_tests[:,index]
+			topTen = dayPred.argsort()[-10:]
 
-		    MoneyPool=MoneyPool+ daygain
-		    gain.append(MoneyPool)
+			daygain=0
 
-	return gain
+			for stock in topTen:
+				if abs(dayY[stock]) <0.97:
+					daygain =daygain + MoneyPool/10*dayPred[stock]*(dayY[stock]/10-0.002)
+			#print daygain
+
+			MoneyPool=MoneyPool+ daygain
+			gain.append(MoneyPool)
+
+		return gain
 
 
 	def simWithNaiveMulti(self, p, y_test):

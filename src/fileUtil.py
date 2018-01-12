@@ -20,7 +20,7 @@ class FileUtil:
 		return df
 
 
-	 def getResults(self):
+	def getResults(self):
 		resultPath = '/home/congq/SPNN/result/'
 		#resultPath = '/home/congq/result'  
 		dirList = os.listdir(resultPath)

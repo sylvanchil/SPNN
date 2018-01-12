@@ -7,7 +7,7 @@ class Configure:
 	midFileDirectory= '%s/midFile' % outputDirectory
 
 	
-	sampleSize = 400
+	sampleSize = 40
 
 	useSavedFile = False
 	saveData = False
@@ -26,7 +26,7 @@ class Configure:
 	window = 55
 	predictWindow = 2
 	#change back to 400
-	epoch = 100
+	epoch = 10
 
 
 
